@@ -1,10 +1,10 @@
 # Alert Panel
 
-A FreeRTOS-Based App for the Raspberry Pi Pico W exposing the Pimoroni Pico RGB Keypad Base via MQTT
+A FreeRTOS-Based App for the Raspberry Pi Pico W exposing the Pimoroni Pico RGB Keypad Base via MQTT over WiFI
 
 ## Prerequisites
 
-1. Install: `sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib`
+1. Install: `sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib astyle`
 
 ## Build
 
@@ -14,3 +14,7 @@ A FreeRTOS-Based App for the Raspberry Pi Pico W exposing the Pimoroni Pico RGB 
 4. Configure: `cd ../../build && cmake ..`
 5. Make: `make alert-panel-app`
 6. Upload to pico using BOOTSEL: `build/alert_panel_app.uf2`
+
+## Style
+
+1. Use astyle: `astyle ./src/*.c ./src/*.h ./include/*.h`

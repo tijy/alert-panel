@@ -42,6 +42,13 @@
 *.idb
 *.pdb
 
+# astyle
+*.orig
+
+# build directory
+build/*
+!build/PLACEHOLDER
+
 # Kernel Module Compile Results
 *.mod*
 *.cmd

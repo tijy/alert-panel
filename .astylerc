@@ -1,0 +1,59 @@
+# Set indentation to 4 spaces
+indent=spaces=4
+
+# Style brackets in Allman style (brackets on a new line)
+style=allman
+
+# Indent 'switch' blocks so that case statements are indented in the switch block
+indent-switches
+
+#Indent C++ style comments beginning in column one
+indent-col1-comments
+
+# Set the  maximum of # spaces to indent a continuation line
+max-continuation-indent=60
+
+# Pad empty lines around header blocks (e.g. 'if', 'for', 'while'...)
+break-blocks
+
+# Add space padding around operators
+pad-oper
+
+# Insert space padding after commas
+pad-comma
+
+# Insert space padding after include directives
+pad-include
+
+# Insert space padding between a header (e.g. 'if', 'for', 'while'...) and the following paren
+pad-header
+
+# Remove extra spaces at the end of lines
+delete-empty-lines
+
+#Remove superfluous empty lines exceeding the given number
+squeeze-lines=1
+
+# Remove superfluous whitespace
+squeeze-ws
+
+# Indent preprocessor directives
+indent-preprocessor
+
+# Align pointer/reference symbols to the name
+align-pointer=name
+
+# Break one line headers (e.g. 'if', 'while', 'else', ...)
+break-one-line-headers
+
+# Add braces to unbraced one line conditional statements (e.g. 'if', 'for', 'while'...)
+add-braces
+
+# Attach the return type to the function name
+attach-return-type
+
+# Break a line if the code exceeds # characters
+max-code-length=140
+
+# cause the logical conditionals to be placed last on the previous line
+break-after-logical

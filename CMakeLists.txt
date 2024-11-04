@@ -12,6 +12,9 @@ include(lib/FreeRTOS-Kernel/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_impor
 # import coreMQTT
 include(coreMQTT_import.cmake)
 
+# import tiny-json
+include(tiny-json_import.cmake)
+
 # project
 project(alert_panel)
 
@@ -42,6 +45,7 @@ target_link_libraries(alert_panel_app
                         hardware_i2c
                         hardware_spi
                         coreMQTT
+                        tiny-json
                         pico_lwip_iperf                  
                         FreeRTOS-Kernel-Heap4)
 

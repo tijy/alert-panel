@@ -49,6 +49,9 @@
 build/*
 !build/PLACEHOLDER
 
+# credentials
+include/alert_panel_config.h
+
 # Kernel Module Compile Results
 *.mod*
 *.cmd

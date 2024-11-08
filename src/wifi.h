@@ -23,7 +23,7 @@
 
 /**
  * @file wifi.h
- * @brief
+ * @brief Public functions in this module file are NOT thread-safe
  */
 #ifndef _WIFI_H
 #define _WIFI_H
@@ -40,6 +40,6 @@ void WifiInit();
  * @param ssid
  * @param password
  */
-void WifiConnect(const char * ssid, const char * password);
+void WifiConnect(const char *ssid, const char *password);
 
 #endif //_WIFI_H

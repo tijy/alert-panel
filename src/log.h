@@ -23,13 +23,23 @@
 
 /**
 * @file log.h
-* @brief
+* @brief Public functions in this module file are thread-safe
 */
 #ifndef _LOG_H
 #define _LOG_H
 
 // FreeRTOS-Kernel includes
 #include "FreeRTOS.h"
+
+typedef enum
+{
+    DEBUG = 1,
+    INFO = 2,
+    WARN = 3,
+    ERROR = 4,
+    FATAL = 5
+}
+LogLevel_t;
 
 /**
  * @brief

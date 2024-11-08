@@ -30,6 +30,10 @@
 // standard includes
 #include <stdio.h>
 
+// FreeRTOS-Kernel includes
+#include "FreeRTOS.h"
+#include "task.h"
+
 /**
  * @brief Converts a byte array to hex string (for log purposes)
  * hex_length must == (buffer_length * 3) + 1
@@ -39,10 +43,16 @@
  * @param buffer
  * @param buffer_length
  */
-void BytesToHex(char * output_hex, size_t output_hex_length, const char * buffer, const size_t buffer_length)
+void BytesToHex(char *output_hex, size_t output_hex_length, const char *buffer, const size_t buffer_length)
 {
     for (size_t i = 0; i < buffer_length; i++)
     {
         output_hex += sprintf(output_hex, "%02X ", buffer[i]);
     }
+}
+
+uint32_t GetTimeMs(void)
+{
+    // Implement a platform-specific way to return current time in milliseconds.
+    return (uint32_t)(xTaskGetTickCount() * portTICK_PERIOD_MS);
 }

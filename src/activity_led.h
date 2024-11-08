@@ -23,7 +23,7 @@
 
 /**
 * @file activity_led.h
-* @brief
+* @brief Public functions in this module file are thread-safe
 */
 #ifndef _ACTIVITY_LED_H
 #define _ACTIVITY_LED_H

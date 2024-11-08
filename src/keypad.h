@@ -22,44 +22,63 @@
  */
 
 /**
-* @file wifi.c
-* @brief
+* @file keypad.h
+* @brief Public functions in this module file are thread-safe
 */
-#include "wifi.h"
+#ifndef _KEYPAD_H
+#define _KEYPAD_H
 
-// pico-sdk includes
-#include "pico/stdlib.h"
-#include "pico/cyw43_arch.h"
+// standard includes
+#include <stdint.h>
+#include <stdbool.h>
 
-// alert-panel includes
-#include "activity_led.h"
-#include "log.h"
-#include "system.h"
+// FreeRTOS-Kernel includes
+#include "FreeRTOS.h"
 
-/*-----------------------------------------------------------*/
-
-void WifiInit()
+typedef enum
 {
-    if (cyw43_arch_init())
-    {
-        LogPrint("FATAL", __FILE__, "Failed to initialise cyw43 chip\n");
-        Fault();
-    }
+    NONE = 1,
+    FLASH = 2,
+    PULSE = 3,
 }
+KeypadLedEffect_t;
 
-/*-----------------------------------------------------------*/
-
-void WifiConnect(const char *ssid, const char *password)
+typedef struct
 {
-    ActivityLedSetFlash(25);
-    cyw43_arch_enable_sta_mode();
-    LogPrint("INFO", __FILE__, "Attempting to connecting to '%s' WiFi...\n", ssid);
-
-    if (cyw43_arch_wifi_connect_timeout_ms(ssid, password, CYW43_AUTH_WPA2_AES_PSK, 30000))
-    {
-        LogPrint("FATAL", __FILE__, "...WiFi connection failed\n");
-        Fault();
-    }
-
-    LogPrint("INFO", __FILE__, "...WiFi connection success\n");
+    char key_id;
+    bool brightness_set;
+    bool colour_set;
+    bool effect_set;
+    bool state_set;
+    uint8_t brightness;
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+    KeypadLedEffect_t effect;
+    bool state;
 }
+KeypadLedParams_t;
+
+/**
+ * @brief
+ *
+ * @return int
+ */
+int KeypadInit();
+
+/**
+ * @brief
+ *
+ * @param priority
+ * @param core_affinity_mask
+ */
+void KeypadTaskCreate(UBaseType_t priority, UBaseType_t core_affinity_mask);
+
+/**
+ * @brief Submits led parameters to be written to the keypad
+ *
+ * @param led_params
+ */
+void KeypadLedParamsSend(KeypadLedParams_t *led_params);
+
+#endif //_KEYPAD_H

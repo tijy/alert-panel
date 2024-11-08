@@ -25,7 +25,10 @@ pico_sdk_init()
 add_executable(alert_panel_app
     src/activity_led.c
     src/keypad_driver.c
+    src/keypad.c
     src/log.c
+    src/led_monitor.c
+    src/led_msg.c
     src/mqtt.c
     src/system.c
     src/util.c

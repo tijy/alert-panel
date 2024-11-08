@@ -23,7 +23,7 @@
 
 /**
 * @file system.h
-* @brief
+* @brief Public functions in this module file are thread-safe
 */
 #ifndef _SYSTEM_H
 #define _SYSTEM_H
@@ -53,7 +53,7 @@
  */
 BaseType_t xTaskCreatePinnedToCore(
     TaskFunction_t pvTaskCode,
-    const char * pcName,
+    const char *pcName,
     const uint32_t usStackDepth,
     void *pvParameters,
     UBaseType_t uxPriority,
@@ -67,5 +67,11 @@ BaseType_t xTaskCreatePinnedToCore(
  *
  */
 void Fault();
+
+/**
+ * @brief Stack overflow handler
+ *
+ */
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
 
 #endif //_SYSTEM_H

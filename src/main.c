@@ -40,16 +40,21 @@
 #include "system.h"
 #include "mqtt.h"
 #include "log.h"
+#include "led_monitor.h"
+#include "keypad.h"
 #include "wifi.h"
 #include "alert_panel_config.h"
 
 // Core 0 priorities
-#define PRIORITY_LAUNCH ( tskIDLE_PRIORITY + 1U )
-#define PRIORITY_LED    ( tskIDLE_PRIORITY + 1U )
-#define PRIORITY_LOG    ( tskIDLE_PRIORITY + 3U )
+#define PRIORITY_LAUNCH             ( tskIDLE_PRIORITY + 1U )
+#define PRIORITY_ACTIVITY_LED       ( tskIDLE_PRIORITY + 2U )
+#define PRIORITY_LOG                ( tskIDLE_PRIORITY + 3U )
+#define PRIORITY_LED_MONITOR        ( tskIDLE_PRIORITY + 4U )
+#define PRIORITY_BUTTON_MONITOR     ( tskIDLE_PRIORITY + 5U )
+#define PRIORITY_KEYPAD             ( tskIDLE_PRIORITY + 6U ) // Most important, want timely polling of buttons
 
 // Core 1 priorities
-#define PRIORITY_MQTT   ( tskIDLE_PRIORITY + 1U )
+#define PRIORITY_MQTT               ( tskIDLE_PRIORITY + 1U ) // Dedicated core for comms
 
 /**
  * @brief
@@ -61,26 +66,22 @@ static void launch_task(void *params)
     // 1) Initialise logging first so we get messages through
     LogInit();
     LogTaskCreate(PRIORITY_LOG, AFFINITY_CORE_0);
-
     // 2) Initialise wifi (this uses cyw43 which is also required for the activity led!)
     WifiInit();
-
     // 2) Initialise activity led so we get simple visual indication of progress
     ActivityLedInit();
-    ActivityLedTaskCreate(PRIORITY_LED, AFFINITY_CORE_0);
-
+    ActivityLedTaskCreate(PRIORITY_ACTIVITY_LED, AFFINITY_CORE_0);
     // 3) Connect wifi
     WifiConnect(WIFI_SSID, WIFI_PASSWORD);
-
     // 4) Start mqtt service task
     MqttInit();
     MqttTaskCreate(PRIORITY_MQTT, AFFINITY_CORE_1);
-
-    // 5) Connect to MQTT broker
-
-    // 5) Start button monitoring
-
-    // 6) Start led monitoring
+    // 5) Start keypad task
+    KeypadInit();
+    KeypadTaskCreate(PRIORITY_KEYPAD, AFFINITY_CORE_0);
+    // 5) Start led & button monitoring
+    //ButtonMonitorTaskCreate(PRIORITY_BUTTON_MONITOR, AFFINITY_CORE_0);
+    LedMonitorTaskCreate(PRIORITY_LED_MONITOR, AFFINITY_CORE_0);
 
     // Watchdog for hangs
     while (true)
@@ -98,14 +99,11 @@ int main(void)
 {
     // Init stdio
     stdio_init_all();
-
     // Allow for usb connection for debugging purposes
     sleep_ms(5000);
     printf("Starting alert-panel...\n");
-
     // Create launch task
     xTaskCreatePinnedToCore(launch_task, "LaunchTask", configMINIMAL_STACK_SIZE, NULL, PRIORITY_LAUNCH, NULL, AFFINITY_CORE_0);
-
     // Start scheduler
     vTaskStartScheduler();
 }

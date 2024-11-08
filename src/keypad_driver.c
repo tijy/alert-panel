@@ -51,38 +51,63 @@
 #define MOSI    19
 
 /**
- * @brief
+ * @brief Brightness information for each led, used for restoration on state = ON
  *
  */
-static uint8_t buffer[(NUM_PADS * 4) + 8];
+static float led_restore_brightness[NUM_PADS];
 
 /**
- * @brief
+ * @brief ON/OFF information for each led
  *
  */
-static uint8_t * led_data;
+static bool led_state[NUM_PADS];
+
+/**
+ * @brief Full led_buffer to be written to device
+ *
+ */
+static uint8_t led_buffer[(NUM_PADS * 4) + 8];
+
+/**
+ * @brief Pointer to start of led colour/brightness information in led_buffer
+ *
+ */
+static uint8_t *led_data;
 
 /*-----------------------------------------------------------*/
 
 void KeypadDriverInit(void)
 {
-    memset(buffer, 0, sizeof(buffer));
-    led_data = buffer + 4;
+    memset(led_buffer, 0, sizeof(led_buffer));
+    led_data = led_buffer + 4;
 
-    KeypadDriverSetLedOffAll();
+    for (uint16_t i = 0; i < NUM_PADS; i++)
+    {
+        led_restore_brightness[i] = 0.5f;
+        led_state[i] = true;
+        KeypadDriverSetLedBrightness(i, 0.5f);
+        KeypadDriverSetLedColour(i, 255, 255, 255);
+    }
 
     i2c_init(i2c0, 400000);
     gpio_set_function(SDA, GPIO_FUNC_I2C);
     gpio_pull_up(SDA);
     gpio_set_function(SCL, GPIO_FUNC_I2C);
     gpio_pull_up(SCL);
-
     spi_init(spi0, 4 * 1024 * 1024);
     gpio_set_function(CS, GPIO_FUNC_SIO);
     gpio_set_dir(CS, GPIO_OUT);
     gpio_put(CS, 1);
     gpio_set_function(SCK, GPIO_FUNC_SPI);
     gpio_set_function(MOSI, GPIO_FUNC_SPI);
+    KeypadDriverFlush();
+
+    for (uint16_t i = 0; i < NUM_PADS; i++)
+    {
+        KeypadDriverSetLedOff(i);
+        KeypadDriverSetLedBrightness(i, 0.0f);
+        KeypadDriverSetLedColour(i, 0, 0, 0);
+    }
 
     KeypadDriverFlush();
 }
@@ -91,26 +116,22 @@ void KeypadDriverInit(void)
 
 void KeypadDriverSetLedBrightness(uint8_t i, float brightness)
 {
-    if(i < 0 || i >= NUM_PADS)
+    if (i < 0 || i >= NUM_PADS)
     {
         return;
     }
 
-    if(brightness < 0.0f || brightness > 1.0f)
+    if (brightness < 0.0f || brightness > 1.0f)
     {
         return;
     }
 
-    led_data[i * 4] = 0b11100000 | (uint8_t)(brightness * (float)0b11111);
-}
+    // Set restore value in case we're OFF
+    led_restore_brightness[i] = brightness;
 
-/*-----------------------------------------------------------*/
-
-void KeypadDriverSetLedBrightnessAll(float brightness)
-{
-    for(uint16_t i = 0; i < NUM_PADS; i++)
+    if (led_state[i]) // if we're ON, set brightness on device
     {
-        KeypadDriverSetLedBrightness(i, brightness);
+        led_data[i * 4] = 0b11100000 | (uint8_t)(brightness * (float)0b11111);
     }
 }
 
@@ -118,7 +139,7 @@ void KeypadDriverSetLedBrightnessAll(float brightness)
 
 void KeypadDriverSetLedColour(uint8_t i, uint8_t r, uint8_t g, uint8_t b)
 {
-    if(i < 0 || i >= NUM_PADS)
+    if (i < 0 || i >= NUM_PADS)
     {
         return;
     }
@@ -131,20 +152,32 @@ void KeypadDriverSetLedColour(uint8_t i, uint8_t r, uint8_t g, uint8_t b)
 
 /*-----------------------------------------------------------*/
 
-void KeypadDriverSetLedColourAll(uint8_t r, uint8_t g, uint8_t b)
+void KeypadDriverSetLedOn(uint8_t i)
 {
-    for(uint16_t i = 0; i < NUM_PADS; i++)
+    if (i < 0 || i >= NUM_PADS)
     {
-        KeypadDriverSetLedColour(i, r, g, b);
+        return;
     }
+
+    // Note we're now ON
+    led_state[i] = true;
+    // Set brightness to restore value
+    led_data[i * 4] = 0b11100000 | (uint8_t)(led_restore_brightness[i] * (float)0b11111);
 }
 
 /*-----------------------------------------------------------*/
 
-void KeypadDriverSetLedOffAll(void)
+void KeypadDriverSetLedOff(uint8_t i)
 {
-    KeypadDriverSetLedBrightnessAll(0.0f);
-    KeypadDriverSetLedColourAll(0, 0, 0);
+    if (i < 0 || i >= NUM_PADS)
+    {
+        return;
+    }
+
+    // Note we're now OFF
+    led_state[i] = false;
+    // Set brightness to 0.0f
+    led_data[i * 4] = 0b11100000 | (uint8_t)(0.0f * (float)0b11111);
 }
 
 /*-----------------------------------------------------------*/
@@ -163,6 +196,6 @@ uint16_t KeypadDriverGetButtonStates(void)
 void KeypadDriverFlush(void)
 {
     gpio_put(CS, 0);
-    spi_write_blocking(spi0, buffer, sizeof(buffer));
+    spi_write_blocking(spi0, led_buffer, sizeof(led_buffer));
     gpio_put(CS, 1);
 }

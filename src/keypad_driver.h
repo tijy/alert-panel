@@ -25,6 +25,7 @@
 /**
 * @file keypad_driver.h
 * @brief Adapted from https://github.com/pimoroni/pimoroni-pico/tree/main/libraries/pico_rgb_keypad
+* Public functions in this module file are NOT thread-safe
 */
 #ifndef _KEYPAD_DRIVER_H
 #define _KEYPAD_DRIVER_H
@@ -33,13 +34,13 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief Initialise keypad driver
  *
  */
 void KeypadDriverInit(void);
 
 /**
- * @brief
+ * @brief Set the led brightness for an individual button
  *
  * @param i
  * @param brightness
@@ -47,14 +48,7 @@ void KeypadDriverInit(void);
 void KeypadDriverSetLedBrightness(uint8_t i, float brightness);
 
 /**
- * @brief
- *
- * @param brightness
- */
-void KeypadDriverSetLedBrightnessAll(float brightness);
-
-/**
- * @brief
+ * @brief Set the led colour for an individual button
  *
  * @param i
  * @param r
@@ -64,29 +58,28 @@ void KeypadDriverSetLedBrightnessAll(float brightness);
 void KeypadDriverSetLedColour(uint8_t i, uint8_t r, uint8_t g, uint8_t b);
 
 /**
- * @brief
+ * @brief Turn the led on for an individual button
  *
- * @param r
- * @param g
- * @param b
+ * @param i
  */
-void KeypadDriverSetLedColourAll(uint8_t r, uint8_t g, uint8_t b);
+void KeypadDriverSetLedOn(uint8_t i);
 
 /**
- * @brief
+ * @brief  Turn the led off for an individual button
  *
+ * @param i
  */
-void KeypadDriverSetLedOffAll(void);
+void KeypadDriverSetLedOff(uint8_t i);
 
 /**
- * @brief
+ * @brief Get all current button states
  *
  * @return uint16_t
  */
 uint16_t KeypadDriverGetButtonStates(void);
 
 /**
- * @brief
+ * @brief Write changed led values to the device
  *
  */
 void KeypadDriverFlush(void);

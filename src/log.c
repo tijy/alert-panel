@@ -30,6 +30,8 @@
 // standard includes
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdint.h>
+#include <math.h>
 
 // FreeRTOS-Kernel includes
 #include "task.h"
@@ -37,6 +39,7 @@
 
 // alert-panel includes
 #include "system.h"
+#include "util.h"
 
 /**
  * @brief
@@ -121,6 +124,7 @@ int LogPrint(const char *level, const char *module, const char *fmt, ...)
 
 static void LogTask(void *params)
 {
+    LogPrint("INFO", __FILE__, "LogTask running...\n");
     Message msg;
 
     for (;;)
@@ -143,9 +147,10 @@ static int LogVargPrint(const char *level, const char *module, const char *fmt, 
 {
     Message msg;
     int core_id = portGET_CORE_ID();
+    uint32_t time_ms = GetTimeMs();
     int bytes_written;
+    bytes_written = snprintf(msg, sizeof(msg), "[%.3f] [%s] [%s] [%d] ", time_ms / 1000.0, level, module, core_id);
 
-    bytes_written = snprintf(msg, sizeof(msg), "[%s] [%s] [%d] ", level, module, core_id);
     if (bytes_written < 0)
     {
         LogPrint("FATAL", __FILE__, "Log message build failed"); // This might not get through?

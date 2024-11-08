@@ -23,7 +23,7 @@
 
 /**
 * @file mqtt.h
-* @brief
+* @brief Public functions in this module file are thread-safe
 */
 #ifndef _MQTT_H
 #define _MQTT_H
@@ -110,15 +110,15 @@ void MqttTaskCreate(UBaseType_t priority, UBaseType_t core_affinity_mask);
  */
 void MqttSubmitConnect(bool clean_session,
                        uint16_t keep_alive,
-                       const char * client_id,
+                       const char *client_id,
                        uint16_t client_id_length,
-                       const char * username,
+                       const char *username,
                        uint16_t username_length,
-                       const char * password,
+                       const char *password,
                        uint16_t password_length,
-                       const char * will_topic,
+                       const char *will_topic,
                        size_t will_topic_length,
-                       const char * will_payload,
+                       const char *will_payload,
                        size_t will_payload_length,
                        MQTTQoS_t will_qos,
                        bool will_retain);
@@ -133,9 +133,9 @@ void MqttSubmitConnect(bool clean_session,
  * @param qos
  * @param retain
  */
-void MqttSubmitPublish(const char * topic,
+void MqttSubmitPublish(const char *topic,
                        size_t topic_length,
-                       const char * payload,
+                       const char *payload,
                        size_t payload_length,
                        MQTTQoS_t qos,
                        bool retain);
@@ -147,7 +147,7 @@ void MqttSubmitPublish(const char * topic,
  * @param topic_length
  * @param qos
  */
-void MqttSubmitSubscribe(const char * topic,
+void MqttSubmitSubscribe(const char *topic,
                          size_t topic_length,
                          MQTTQoS_t qos);
 

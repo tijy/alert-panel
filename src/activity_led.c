@@ -38,6 +38,7 @@
 #include "task.h"
 
 // alert-panel includes
+#include "log.h"
 #include "system.h"
 
 /**
@@ -89,7 +90,8 @@ void ActivityLedInit()
 
 void ActivityLedTaskCreate(UBaseType_t priority, UBaseType_t core_affinity_mask)
 {
-    xTaskCreatePinnedToCore(ActivityLedTask, "ActivityLedTask", configMINIMAL_STACK_SIZE, NULL, priority, &activity_led_task_handle, core_affinity_mask);
+    xTaskCreatePinnedToCore(ActivityLedTask, "ActivityLedTask", configMINIMAL_STACK_SIZE, NULL, priority, &activity_led_task_handle,
+                            core_affinity_mask);
 }
 
 /*-----------------------------------------------------------*/
@@ -117,9 +119,11 @@ void ActivityLedSetOff()
 
 static void ActivityLedTask(void *params)
 {
+    LogPrint("INFO", __FILE__, "ActivityLedTask running...\n");
     bool flash = true;
     uint32_t delay = DEFAULT_DELAY;
     uint32_t received_value;
+
     while (1)
     {
         // How long should we wait for notify timeout?

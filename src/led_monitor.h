@@ -22,44 +22,21 @@
  */
 
 /**
-* @file wifi.c
-* @brief
+* @file led_monitor.h
+* @brief Public functions in this module file are thread-safe
 */
-#include "wifi.h"
+#ifndef _LED_MONITOR_H
+#define _LED_MONITOR_H
 
-// pico-sdk includes
-#include "pico/stdlib.h"
-#include "pico/cyw43_arch.h"
+// FreeRTOS-Kernel includes
+#include "FreeRTOS.h"
 
-// alert-panel includes
-#include "activity_led.h"
-#include "log.h"
-#include "system.h"
+/**
+ * @brief reates a task for keypad led monitoring
+ *
+ * @param priority
+ * @param core_affinity_mask
+ */
+void LedMonitorTaskCreate(UBaseType_t priority, UBaseType_t core_affinity_mask);
 
-/*-----------------------------------------------------------*/
-
-void WifiInit()
-{
-    if (cyw43_arch_init())
-    {
-        LogPrint("FATAL", __FILE__, "Failed to initialise cyw43 chip\n");
-        Fault();
-    }
-}
-
-/*-----------------------------------------------------------*/
-
-void WifiConnect(const char *ssid, const char *password)
-{
-    ActivityLedSetFlash(25);
-    cyw43_arch_enable_sta_mode();
-    LogPrint("INFO", __FILE__, "Attempting to connecting to '%s' WiFi...\n", ssid);
-
-    if (cyw43_arch_wifi_connect_timeout_ms(ssid, password, CYW43_AUTH_WPA2_AES_PSK, 30000))
-    {
-        LogPrint("FATAL", __FILE__, "...WiFi connection failed\n");
-        Fault();
-    }
-
-    LogPrint("INFO", __FILE__, "...WiFi connection success\n");
-}
+#endif //_LED_MONITOR_H

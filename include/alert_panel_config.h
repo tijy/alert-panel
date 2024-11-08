@@ -30,20 +30,20 @@
 #define WIFI_PASSWORD          "xxx"
 
 // Mqtt connection parameters
-#define MQTT_BROKER_ADDRESS    "xxx" // Only works with IP addresses???
-#define MQTT_BROKER_PORT       1883
-#define MQTT_TOPIC_SUBSCRIBE   "example/topic"
-#define MQTT_TOPIC_PUBLISH     "example/response"
-#define MQTT_CLIENT_ID         "alert_panel_1"
-#define MQTT_BROKER_USERNAME   "xxx"
-#define MQTT_BROKER_PASSWORD   "xxx"
-#define MQTT_KEEP_ALIVE        10 // Keep alive second, don't set too large to ensure timely will (availability) message deelivery
-
-// Mqtt command queue buffer max sizes (ensure these are sized appropriate to required data sizes)
-#define MQTT_TOPIC_BUFFER_SIZE      30
-#define MQTT_PAYLOAD_BUFFER_SIZE    150
+#define MQTT_BROKER_ADDRESS         "xxx" // Only works with IP addresses, DNS resolution not working at the moment
+#define MQTT_BROKER_PORT            1883
+#define MQTT_KEEP_ALIVE             10 // Keep alive second, don't set too large to ensure timely 'offline' will message delivery
+#define MQTT_CLIENT_ID              "alert_panel_1"
+#define MQTT_BROKER_USERNAME        "xxx"
+#define MQTT_BROKER_PASSWORD        "xxx"
 #define MQTT_CLIENT_ID_BUFFER_SIZE  30
 #define MQTT_USERNAME_BUFFER_SIZE   30
 #define MQTT_PASSWORD_BUFFER_SIZE   30
+
+// Internal buffer sizes (Ensure these are all sized large enough for holding their respective data)
+#define MQTT_PACKET_BUFFER_SIZE     1024 // Size of buffer for storing mqtt packet bytesduring recv call
+#define MQTT_TOPIC_BUFFER_SIZE      40   // Size of buffer storing topic data strings
+#define MQTT_PAYLOAD_BUFFER_SIZE    200  // Size of buffer storing payload data strings
+#define MQTT_PUBLISH_LIST_SIZE      20   // Maximum number of outstanding QoS 2 & 3 message
 
 #endif //_ALERT_PANEL_CONFIG_H

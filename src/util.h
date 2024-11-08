@@ -23,13 +23,14 @@
 
 /**
 * @file util.h
-* @brief
+* @brief Public functions in this module file are thread-safe
 */
 #ifndef _UTIL_H
 #define _UTIL_H
 
 // standard includes
 #include <stddef.h>
+#include <stdint.h>
 
 /**
  * @brief
@@ -39,6 +40,13 @@
  * @param buffer
  * @param buffer_length
  */
-void BytesToHex(char * output_hex, size_t output_hex_length, const char * buffer, const size_t buffer_length);
+void BytesToHex(char *output_hex, size_t output_hex_length, const char *buffer, const size_t buffer_length);
+
+/**
+ * @brief Get the Time Ms object
+ *
+ * @return uint32_t
+ */
+uint32_t GetTimeMs(void);
 
 #endif //_UTIL_H

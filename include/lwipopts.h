@@ -103,5 +103,4 @@
 #define LWIP_SO_RCVTIMEO 1
 #endif
 
-
 #endif

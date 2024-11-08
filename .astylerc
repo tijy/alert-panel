@@ -23,7 +23,7 @@ pad-oper
 pad-comma
 
 # Insert space padding after include directives
-pad-include
+#pad-include
 
 # Insert space padding between a header (e.g. 'if', 'for', 'while'...) and the following paren
 pad-header
@@ -32,10 +32,10 @@ pad-header
 delete-empty-lines
 
 #Remove superfluous empty lines exceeding the given number
-squeeze-lines=1
+#squeeze-lines=1
 
 # Remove superfluous whitespace
-squeeze-ws
+#squeeze-ws
 
 # Indent preprocessor directives
 indent-preprocessor

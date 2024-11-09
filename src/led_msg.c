@@ -94,7 +94,7 @@ bool LedMsgParseCmdTopic(KeypadLedParams_t *params, char *topic, size_t topic_le
 {
     if (topic_length <= 0)
     {
-        LogPrint("ERROR", __FILE__, "Received led cmd message topic is 0 length\n");
+        LogPrintError("Received led cmd message topic is 0 length\n");
         return false;
     }
 
@@ -103,18 +103,17 @@ bool LedMsgParseCmdTopic(KeypadLedParams_t *params, char *topic, size_t topic_le
 
     if (topic_length != expected_topic_length)
     {
-        LogPrint("ERROR", __FILE__, "Received led cmd message topic is unexpected length\n");
+        LogPrintError("Received led cmd message topic is unexpected length\n");
         return false;
     }
 
     if (strncmp(topic, LED_CMD_TOPIC, (topic_length - 1)) != 0)
     {
-        LogPrint("ERROR", __FILE__, "Received led cmd message topic is not in expected form\n");
+        LogPrintError("Received led cmd message topic is not in expected form\n");
         return false;
     }
 
     params->key_id = topic[topic_length - 1]; // get the last character (key_id)
-    LogPrint("DEBUG", __FILE__, "Received led cmd message for key: %c\n", params->key_id);
     return true;
 }
 
@@ -125,7 +124,7 @@ bool LedMsgParseCmdPayload(KeypadLedParams_t *params, const char *payload, size_
     // Sanity check
     if (payload_length > MQTT_PAYLOAD_BUFFER_SIZE)
     {
-        LogPrint("ERROR", __FILE__, "payload_length > MQTT_PAYLOAD_BUFFER_SIZE\n");
+        LogPrintError("payload_length > MQTT_PAYLOAD_BUFFER_SIZE\n");
         return false;
     }
 
@@ -146,7 +145,7 @@ bool LedMsgParseCmdPayload(KeypadLedParams_t *params, const char *payload, size_
 
     if (!json_obj)
     {
-        LogPrint("ERROR", __FILE__, "Error parsing received mqtt message to json\n");
+        LogPrintError("Error parsing received mqtt message to json\n");
         return false;
     }
 

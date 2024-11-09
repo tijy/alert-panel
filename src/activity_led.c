@@ -119,7 +119,7 @@ void ActivityLedSetOff()
 
 static void ActivityLedTask(void *params)
 {
-    LogPrint("INFO", __FILE__, "ActivityLedTask running...\n");
+    LogPrintInfo("ActivityLedTask running...\n");
     bool flash = true;
     uint32_t delay = DEFAULT_DELAY;
     uint32_t received_value;

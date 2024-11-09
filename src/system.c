@@ -205,6 +205,6 @@ void Fault()
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
-    LogPrint("FATAL", __FILE__, "Stack overflow detected in: %s\n", pcTaskName);
+    LogPrintFatal("Stack overflow detected in: %s\n", pcTaskName);
     Fault();
 }

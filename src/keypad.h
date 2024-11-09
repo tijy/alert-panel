@@ -77,8 +77,8 @@ void KeypadTaskCreate(UBaseType_t priority, UBaseType_t core_affinity_mask);
 /**
  * @brief Submits led parameters to be written to the keypad
  *
- * @param led_params
+ * @param params
  */
-void KeypadLedParamsSend(KeypadLedParams_t *led_params);
+void KeypadLedParamsSend(KeypadLedParams_t *params);
 
 #endif //_KEYPAD_H

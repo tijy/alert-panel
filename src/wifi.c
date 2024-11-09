@@ -42,7 +42,7 @@ void WifiInit()
 {
     if (cyw43_arch_init())
     {
-        LogPrint("FATAL", __FILE__, "Failed to initialise cyw43 chip\n");
+        LogPrintFatal("Failed to initialise cyw43 chip\n");
         Fault();
     }
 }
@@ -53,13 +53,13 @@ void WifiConnect(const char *ssid, const char *password)
 {
     ActivityLedSetFlash(25);
     cyw43_arch_enable_sta_mode();
-    LogPrint("INFO", __FILE__, "Attempting to connecting to '%s' WiFi...\n", ssid);
+    LogPrintInfo("Attempting to connecting to '%s' WiFi...\n", ssid);
 
     if (cyw43_arch_wifi_connect_timeout_ms(ssid, password, CYW43_AUTH_WPA2_AES_PSK, 30000))
     {
-        LogPrint("FATAL", __FILE__, "...WiFi connection failed\n");
+        LogPrintFatal("...WiFi connection failed\n");
         Fault();
     }
 
-    LogPrint("INFO", __FILE__, "...WiFi connection success\n");
+    LogPrintInfo("...WiFi connection success\n");
 }

@@ -99,8 +99,10 @@ int main(void)
 {
     // Init stdio
     stdio_init_all();
-    // Allow for usb connection for debugging purposes
-    sleep_ms(5000);
+#ifdef DEBUG
+    sleep_ms(5000); // Allow for usb connection for debugging purposes
+    printf("Debug build\n");
+#endif
     printf("Starting alert-panel...\n");
     // Create launch task
     xTaskCreatePinnedToCore(launch_task, "LaunchTask", configMINIMAL_STACK_SIZE, NULL, PRIORITY_LAUNCH, NULL, AFFINITY_CORE_0);

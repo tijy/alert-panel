@@ -25,10 +25,11 @@
 #ifndef _CORE_MQTT_CONFIG_H
 #define _CORE_MQTT_CONFIG_H
 
-
+#ifdef DEBUG
 #define LogError( message ) LogPrintMqttError message;
 #define LogWarn( message ) LogPrintMqttWarn message;
 #define LogInfo( message )  LogPrintMqttInfo message;
 #define LogDebug( message ) LogPrintMqttDebug message;
+#endif
 
 #endif //_CORE_MQTT_CONFIG_H

@@ -124,7 +124,7 @@ int LogPrint(const char *level, const char *module, const char *fmt, ...)
 
 static void LogTask(void *params)
 {
-    LogPrint("INFO", __FILE__, "LogTask running...\n");
+    LogPrintInfo("LogTask running...\n");
     Message msg;
 
     for (;;)
@@ -153,7 +153,7 @@ static int LogVargPrint(const char *level, const char *module, const char *fmt, 
 
     if (bytes_written < 0)
     {
-        LogPrint("FATAL", __FILE__, "Log message build failed"); // This might not get through?
+        LogPrintFatal("Log message build failed"); // This might not get through?
         Fault();
     }
 
@@ -167,7 +167,7 @@ static int LogVargPrint(const char *level, const char *module, const char *fmt, 
     // Send message
     if (xQueueSend(log_queue, &msg, portMAX_DELAY) != pdTRUE)
     {
-        LogPrint("FATAL", __FILE__, "Failed to send to log_queue"); // This might not get through?
+        LogPrintFatal("Failed to send to log_queue"); // This might not get through?
         Fault();
     }
 

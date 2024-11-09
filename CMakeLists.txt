@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.27)
 # set pico board type for wifi support
 set(PICO_BOARD pico_w)
 
+#add_compile_definitions(DEBUG)
+
 # import pico-sdk
 include(lib/pico-sdk/pico_sdk_init.cmake)
 

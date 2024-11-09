@@ -97,7 +97,7 @@ void LedMonitorTaskCreate(UBaseType_t priority, UBaseType_t core_affinity_mask)
 
 static void LedMonitorTask(void *params)
 {
-    LogPrint("INFO", __FILE__, "LedMonitorTask running...\n");
+    LogPrintInfo("LedMonitorTask running...\n");
     LedMonitorConnect();
     LedMonitorPublishInitialStates();
 
@@ -178,14 +178,14 @@ static void LedMonitorCommandReceive()
     // 3) Parse topic
     if (!LedMsgParseCmdTopic(&params, message.topic.data, message.topic.length))
     {
-        LogPrint("WARN", __FILE__, "Failed to parse led cmd topic, ignoring message\n");
+        LogPrintWarn("Failed to parse led cmd topic, ignoring message\n");
         return;
     }
 
     // 4) Parse payload
     if (!LedMsgParseCmdPayload(&params, message.payload.data, message.payload.length))
     {
-        LogPrint("WARN", __FILE__, "Failed to parse led cmd payload, ignoring message\n");
+        LogPrintWarn("Failed to parse led cmd payload, ignoring message\n");
         return;
     }
 

@@ -40,7 +40,7 @@
  * @brief Incoming led parameter messages
  *
  */
-static QueueHandle_t led_params_queue;
+static QueueHandle_t params_queue;
 
 /**
  * @brief Outgoing button event messages
@@ -65,9 +65,9 @@ static void KeypadLedParamsReceive(TickType_t ticks_to_wait);
 /**
  * @brief Processes a single led parameter and calls approproate keypad driver functions to write to device
  *
- * @param led_params
+ * @param params
  */
-static void KeypadProcessLedParams(KeypadLedParams_t *led_params);
+static void KeypadProcessLedParams(KeypadLedParams_t *params);
 
 /**
  * @brief Gets the key index from id (key ids are oriented differently to the pcb layout)
@@ -89,11 +89,11 @@ static float KeypadUint8ToBrightnessFloat(uint8_t in);
 
 int KeypadInit()
 {
-    led_params_queue = xQueueCreate(20, sizeof(KeypadLedParams_t));
+    params_queue = xQueueCreate(20, sizeof(KeypadLedParams_t));
 
-    if (led_params_queue == NULL)
+    if (params_queue == NULL)
     {
-        LogPrint("FATAL", __FILE__, "Failed to create led_params_queue");
+        LogPrintFatal("Failed to create params_queue");
         Fault();
     }
 }
@@ -109,7 +109,7 @@ void KeypadTaskCreate(UBaseType_t priority, UBaseType_t core_affinity_mask)
 
 static void KeypadTask(void *params)
 {
-    LogPrint("INFO", __FILE__, "KeypadTask running...\n");
+    LogPrintInfo("KeypadTask running...\n");
     // Initialise keypad driver
     KeypadDriverInit();
 
@@ -125,23 +125,11 @@ static void KeypadTask(void *params)
 
 /*-----------------------------------------------------------*/
 
-void KeypadLedParamsSend(KeypadLedParams_t *led_params)
+void KeypadLedParamsSend(KeypadLedParams_t *params)
 {
-    LogPrint("DEBUG", __FILE__, "KeypadLedParamsSend\n");
-    LogPrint("DEBUG", __FILE__, "led_params->key_id: %c\n", led_params->key_id);
-    LogPrint("DEBUG", __FILE__, "led_params->brightness_set: %i\n", led_params->brightness_set);
-    LogPrint("DEBUG", __FILE__, "led_params->colour_set: %i\n", led_params->colour_set);
-    LogPrint("DEBUG", __FILE__, "led_params->effect_set: %i\n", led_params->effect_set);
-    LogPrint("DEBUG", __FILE__, "led_params->state_set: %i\n", led_params->state_set);
-    LogPrint("DEBUG", __FILE__, "led_params->brightness: %u\n", led_params->brightness);
-    LogPrint("DEBUG", __FILE__, "led_params->red: %u\n", led_params->red);
-    LogPrint("DEBUG", __FILE__, "led_params->green: %u\n", led_params->green);
-    LogPrint("DEBUG", __FILE__, "led_params->blue: %u\n", led_params->blue);
-    LogPrint("DEBUG", __FILE__, "led_params->state %i\n", led_params->state);
-
-    if (xQueueSend(led_params_queue, led_params, portMAX_DELAY) != pdTRUE)
+    if (xQueueSend(params_queue, params, portMAX_DELAY) != pdTRUE)
     {
-        LogPrint("FATAL", __FILE__, "Failed to send to led_params_queue");
+        LogPrintFatal("Failed to send to params_queue");
         Fault();
     }
 }
@@ -150,25 +138,14 @@ void KeypadLedParamsSend(KeypadLedParams_t *led_params)
 
 static void KeypadLedParamsReceive(TickType_t ticks_to_wait)
 {
-    KeypadLedParams_t led_params;
+    KeypadLedParams_t params;
     bool flush_needed = false;
 
     while (1)
     {
-        if (xQueueReceive(led_params_queue, &led_params, ticks_to_wait) == pdTRUE)
+        if (xQueueReceive(params_queue, &params, ticks_to_wait) == pdTRUE)
         {
-            LogPrint("DEBUG", __FILE__, "KeypadLedParamsReceive\n");
-            LogPrint("DEBUG", __FILE__, "led_params.key_id: %c\n", led_params.key_id);
-            LogPrint("DEBUG", __FILE__, "led_params.brightness_set: %i\n", led_params.brightness_set);
-            LogPrint("DEBUG", __FILE__, "led_params.colour_set: %i\n", led_params.colour_set);
-            LogPrint("DEBUG", __FILE__, "led_params.effect_set: %i\n", led_params.effect_set);
-            LogPrint("DEBUG", __FILE__, "led_params.state_set: %i\n", led_params.state_set);
-            LogPrint("DEBUG", __FILE__, "led_params.brightness: %u\n", led_params.brightness);
-            LogPrint("DEBUG", __FILE__, "led_params.red: %u\n", led_params.red);
-            LogPrint("DEBUG", __FILE__, "led_params.green: %u\n", led_params.green);
-            LogPrint("DEBUG", __FILE__, "led_params.blue: %u\n", led_params.blue);
-            LogPrint("DEBUG", __FILE__, "led_params.state %i\n", led_params.state);
-            KeypadProcessLedParams(&led_params);
+            KeypadProcessLedParams(&params);
             flush_needed = true;
             ticks_to_wait = 0; // Try to get more data from the queue if it exists,
         }
@@ -187,16 +164,26 @@ static void KeypadLedParamsReceive(TickType_t ticks_to_wait)
 
 /*-----------------------------------------------------------*/
 
-static void KeypadProcessLedParams(KeypadLedParams_t *led_params)
+static void KeypadProcessLedParams(KeypadLedParams_t *params)
 {
-    LogPrint("DEBUG", __FILE__, "KeypadProcessLedParams, led_params->key_id: %c\n", led_params->key_id);
-    uint8_t key_index = KeypadIndexFromKeyId(led_params->key_id);
-    LogPrint("DEBUG", __FILE__, "KeypadProcessLedParams, key_index: %u\n", key_index);
+    uint8_t key_index = KeypadIndexFromKeyId(params->key_id);
+    LogPrintDebug("Setting LED parameters...\n");
+    LogPrintDebug("params->key_id: %c\n", params->key_id);
+    LogPrintDebug("params->brightness_set: %i\n", params->brightness_set);
+    LogPrintDebug("params->colour_set: %i\n", params->colour_set);
+    LogPrintDebug("params->effect_set: %i\n", params->effect_set);
+    LogPrintDebug("params->state_set: %i\n", params->state_set);
+    LogPrintDebug("params->brightness: %u\n", params->brightness);
+    LogPrintDebug("params->red: %u\n", params->red);
+    LogPrintDebug("params->green: %u\n", params->green);
+    LogPrintDebug("params->blue: %u\n", params->blue);
+    LogPrintDebug("params->state %i\n", params->state);
+    LogPrintDebug("key_index: %u\n", key_index);
 
     // 1) Led state (ON/OFF)
-    if (led_params->state_set)
+    if (params->state_set)
     {
-        if (led_params->state) // ON
+        if (params->state) // ON
         {
             KeypadDriverSetLedOn(key_index);
         }
@@ -207,15 +194,15 @@ static void KeypadProcessLedParams(KeypadLedParams_t *led_params)
     }
 
     // 2) Led colour (r,g,b)
-    if (led_params->colour_set)
+    if (params->colour_set)
     {
-        KeypadDriverSetLedColour(key_index, led_params->red, led_params->green, led_params->blue);
+        KeypadDriverSetLedColour(key_index, params->red, params->green, params->blue);
     }
 
     // 3) Led brightness
-    if (led_params->brightness_set)
+    if (params->brightness_set)
     {
-        float brightness = KeypadUint8ToBrightnessFloat(led_params->brightness);
+        float brightness = KeypadUint8ToBrightnessFloat(params->brightness);
         KeypadDriverSetLedBrightness(key_index, brightness);
     }
 }
@@ -275,7 +262,7 @@ static uint8_t KeypadIndexFromKeyId(char key_id)
             return 0x0c;
 
         default:
-            LogPrint("FATAL", __FILE__, "Invalid key_id: %c", key_id);
+            LogPrintFatal("Invalid key_id: %c", key_id);
             Fault();
             break;
     }

@@ -292,12 +292,11 @@ void MqttInit(void)
     memset(&transport_interface, 0, sizeof(transport_interface));
     memset(&network_buffer, 0, sizeof(network_buffer));
     memset(&mqtt_context, 0, sizeof(mqtt_context));
-    LogPrint("INFO", __FILE__, "command_queue object size: %u\n", sizeof(MqttCommand_t));
     command_queue = xQueueCreate(20, sizeof(MqttCommand_t));
 
     if (command_queue == NULL)
     {
-        LogPrint("FATAL", __FILE__, "Failed to create command_queue\n");
+        LogPrintFatal("Failed to create command_queue\n");
         Fault();
     }
 
@@ -305,7 +304,7 @@ void MqttInit(void)
 
     if (subscription_queue == NULL)
     {
-        LogPrint("FATAL", __FILE__, "Failed to create subscription_queue\n");
+        LogPrintFatal("Failed to create subscription_queue\n");
         Fault();
     }
 }
@@ -321,27 +320,9 @@ void MqttTaskCreate(UBaseType_t priority, UBaseType_t core_affinity_mask)
 
 static void MqttTask()
 {
-    LogPrint("INFO", __FILE__, "MqttTask running...\n");
+    LogPrintInfo("MqttTask running...\n");
     MqttCommand_t command;
     memset(&command, 0, sizeof(MqttCommand_t));
-    /*
-    LogPrint("INFO", __FILE__, "%s: %u\n", "type", command.type);
-    LogPrint("INFO", __FILE__, "%s: %s\n", "connect.will_message.topic.data", command.connect.will_message.topic.data);
-    LogPrint("INFO", __FILE__, "%s: %u\n", "connect.will_message.topic.length", command.connect.will_message.topic.length);
-    LogPrint("INFO", __FILE__, "%s: %s\n", "connect.will_message.payload.data", command.connect.will_message.payload.data);
-    LogPrint("INFO", __FILE__, "%s: %u\n", "connect.will_message.payload.length", command.connect.will_message.payload.length);
-    LogPrint("INFO", __FILE__, "%s: %u\n", "connect.will_qos", command.connect.will_qos);
-    LogPrint("INFO", __FILE__, "%s: %u\n", "connect.will_retain", command.connect.will_retain);
-    LogPrint("INFO", __FILE__, "%s: %s\n", "publish.message.topic.data", command.publish.message.topic.data);
-    LogPrint("INFO", __FILE__, "%s: %u\n", "publish.message.topic.length", command.publish.message.topic.length);
-    LogPrint("INFO", __FILE__, "%s: %s\n", "publish.message.payload.data", command.publish.message.payload.data);
-    LogPrint("INFO", __FILE__, "%s: %u\n", "publish.message.payload.length", command.publish.message.payload.length);
-    LogPrint("INFO", __FILE__, "%s: %u\n", "publish.qos", command.publish.qos);
-    LogPrint("INFO", __FILE__, "%s: %u\n", "publish.retain", command.publish.retain);
-    LogPrint("INFO", __FILE__, "%s: %s\n", "subscribe.topic.data", command.subscribe.topic.data);
-    LogPrint("INFO", __FILE__, "%s: %u\n", "subscribe.topic.length", command.subscribe.topic.length);
-    LogPrint("INFO", __FILE__, "%s: %u\n", "subscribe.qos", command.subscribe.qos);
-    */
     MQTTStatus_t status;
     TickType_t ticks_to_wait = pdMS_TO_TICKS(10);
 
@@ -350,12 +331,11 @@ static void MqttTask()
         if (connection_state == CONNECTED)
         {
             // Call process loop to do any timeout processing/qos operations
-            //LogPrint("DEBUG", __FILE__, "Calling MQTT_ProcessLoop\n");
             status = MQTT_ProcessLoop(&mqtt_context);
 
             if (status != MQTTSuccess && status != MQTTNeedMoreBytes)
             {
-                //LogPrint("FATAL", __FILE__, "MQTT_ProcessLoop failed with: %u\n", status);
+                LogPrintFatal("MQTT_ProcessLoop failed with: %u\n", status);
                 Fault();
             }
         }
@@ -363,25 +343,6 @@ static void MqttTask()
         // Wait for next command
         if (xQueueReceive(command_queue, &command, ticks_to_wait) == pdTRUE)
         {
-            /*
-            LogPrint("INFO", __FILE__, "%s: %u\n", "type", command.type);
-            LogPrint("INFO", __FILE__, "%s: %s\n", "connect.will_message.topic.data", command.connect.will_message.topic.data);
-            LogPrint("INFO", __FILE__, "%s: %u\n", "connect.will_message.topic.length", command.connect.will_message.topic.length);
-            LogPrint("INFO", __FILE__, "%s: %s\n", "connect.will_message.payload.data", command.connect.will_message.payload.data);
-            LogPrint("INFO", __FILE__, "%s: %u\n", "connect.will_message.payload.length", command.connect.will_message.payload.length);
-            LogPrint("INFO", __FILE__, "%s: %u\n", "connect.will_qos", command.connect.will_qos);
-            LogPrint("INFO", __FILE__, "%s: %u\n", "connect.will_retain", command.connect.will_retain);
-            LogPrint("INFO", __FILE__, "%s: %s\n", "publish.message.topic.data", command.publish.message.topic.data);
-            LogPrint("INFO", __FILE__, "%s: %u\n", "publish.message.topic.length", command.publish.message.topic.length);
-            LogPrint("INFO", __FILE__, "%s: %s\n", "publish.message.payload.data", command.publish.message.payload.data);
-            LogPrint("INFO", __FILE__, "%s: %u\n", "publish.message.payload.length", command.publish.message.payload.length);
-            LogPrint("INFO", __FILE__, "%s: %u\n", "publish.qos", command.publish.qos);
-            LogPrint("INFO", __FILE__, "%s: %u\n", "publish.retain", command.publish.retain);
-            LogPrint("INFO", __FILE__, "%s: %s\n", "subscribe.topic.data", command.subscribe.topic.data);
-            LogPrint("INFO", __FILE__, "%s: %u\n", "subscribe.topic.length", command.subscribe.topic.length);
-            LogPrint("INFO", __FILE__, "%s: %u\n", "subscribe.qos", command.subscribe.qos);
-            */
-
             // Process command
             switch (command.type)
             {
@@ -433,31 +394,31 @@ void MqttSubmitConnect(
 {
     if (client_id_length > MQTT_CLIENT_ID_BUFFER_SIZE)
     {
-        LogPrint("FATAL", __FILE__, "client_id_length > MQTT_CLIENT_ID_BUFFER_SIZE\n");
+        LogPrintFatal("client_id_length > MQTT_CLIENT_ID_BUFFER_SIZE\n");
         Fault();
     }
 
     if (username_length > MQTT_USERNAME_BUFFER_SIZE)
     {
-        LogPrint("FATAL", __FILE__, "username_length > MQTT_USERNAME_BUFFER_SIZE\n");
+        LogPrintFatal("username_length > MQTT_USERNAME_BUFFER_SIZE\n");
         Fault();
     }
 
     if (password_length > MQTT_PASSWORD_BUFFER_SIZE)
     {
-        LogPrint("FATAL", __FILE__, "password_length > MQTT_PASSWORD_BUFFER_SIZE\n");
+        LogPrintFatal("password_length > MQTT_PASSWORD_BUFFER_SIZE\n");
         Fault();
     }
 
     if (will_topic_length > MQTT_TOPIC_BUFFER_SIZE)
     {
-        LogPrint("FATAL", __FILE__, "will_topic_length > MQTT_TOPIC_BUFFER_SIZE\n");
+        LogPrintFatal("will_topic_length > MQTT_TOPIC_BUFFER_SIZE\n");
         Fault();
     }
 
     if (will_payload_length > MQTT_PAYLOAD_BUFFER_SIZE)
     {
-        LogPrint("FATAL", __FILE__, "will_payload_length > MQTT_PAYLOAD_BUFFER_SIZE\n");
+        LogPrintFatal("will_payload_length > MQTT_PAYLOAD_BUFFER_SIZE\n");
         Fault();
     }
 
@@ -481,7 +442,7 @@ void MqttSubmitConnect(
 
     if (xQueueSend(command_queue, &command, portMAX_DELAY) != pdTRUE)
     {
-        LogPrint("FATAL", __FILE__, "Failed to send CONNECT to command_queue\n");
+        LogPrintFatal("Failed to send CONNECT to command_queue\n");
         Fault();
     }
 }
@@ -495,23 +456,15 @@ void MqttSubmitPublish(const char *topic,
                        MQTTQoS_t qos,
                        bool retain)
 {
-    LogPrint("INFO",
-             __FILE__,
-             "MqttSubmitPublish, t:'%s', tl:%u, p:'%s', pl:%u\n",
-             topic,
-             topic_length,
-             payload,
-             payload_length);
-
     if (topic_length > MQTT_TOPIC_BUFFER_SIZE)
     {
-        LogPrint("FATAL", __FILE__, "topic_length > MQTT_TOPIC_BUFFER_SIZE\n");
+        LogPrintFatal("topic_length > MQTT_TOPIC_BUFFER_SIZE\n");
         Fault();
     }
 
     if (payload_length > MQTT_PAYLOAD_BUFFER_SIZE)
     {
-        LogPrint("FATAL", __FILE__, "payload_length > MQTT_PAYLOAD_BUFFER_SIZE\n");
+        LogPrintFatal("payload_length > MQTT_PAYLOAD_BUFFER_SIZE\n");
         Fault();
     }
 
@@ -524,17 +477,10 @@ void MqttSubmitPublish(const char *topic,
     command.publish.message.payload.length = payload_length;
     command.publish.qos = qos;
     command.publish.retain = retain;
-    LogPrint("INFO",
-             __FILE__,
-             "pre xQueueSend, t:'%s', tl:%u, p:'%s', pl:%u\n",
-             command.publish.message.topic.data,
-             command.publish.message.topic.length,
-             command.publish.message.payload.data,
-             command.publish.message.payload.length);
 
     if (xQueueSend(command_queue, &command, portMAX_DELAY) != pdTRUE)
     {
-        LogPrint("FATAL", __FILE__, "Failed to send PUBLISH to command_queue\n");
+        LogPrintFatal("Failed to send PUBLISH to command_queue\n");
         Fault();
     }
 }
@@ -547,7 +493,7 @@ void MqttSubmitSubscribe(const char *topic,
 {
     if (topic_length > MQTT_TOPIC_BUFFER_SIZE)
     {
-        LogPrint("FATAL", __FILE__, "topic_length > MQTT_TOPIC_BUFFER_SIZE\n");
+        LogPrintFatal("topic_length > MQTT_TOPIC_BUFFER_SIZE\n");
         Fault();
     }
 
@@ -560,7 +506,7 @@ void MqttSubmitSubscribe(const char *topic,
 
     if (xQueueSend(command_queue, &command, portMAX_DELAY) != pdTRUE)
     {
-        LogPrint("FATAL", __FILE__, "Failed to send SUBSCRIBE to command_queue\n");
+        LogPrintFatal("Failed to send SUBSCRIBE to command_queue\n");
         Fault();
     }
 }
@@ -573,7 +519,7 @@ MqttMessage_t MqttSubscriptionReceive()
 
     if (xQueueReceive(subscription_queue, &message, portMAX_DELAY) != pdTRUE)
     {
-        LogPrint("FATAL", __FILE__, "subscription_queue receive failed\n");
+        LogPrintFatal("subscription_queue receive failed\n");
         Fault();
     }
 
@@ -591,7 +537,7 @@ static void MqttConnect(const char *will_topic,
 {
     if (connection_state == CONNECTED)
     {
-        LogPrint("FATAL", __FILE__, "MQTT already connected\n");
+        LogPrintFatal("MQTT already connected\n");
         Fault();
     }
 
@@ -618,16 +564,16 @@ static void MqttConnect(const char *will_topic,
     will_info.topicNameLength = (uint16_t) will_topic_length;
     will_info.pPayload = will_payload;
     will_info.payloadLength = (uint16_t) will_payload_length;
-    LogPrint("INFO", __FILE__, "Attempting to connect to MQTT broker...\n");
+    LogPrintInfo("Attempting to connect to MQTT broker with user '%s' as '%s'\n", connect_info.pUserName, connect_info.pClientIdentifier);
     MQTTStatus_t status = MQTT_Connect(&mqtt_context, &connect_info, &will_info, 5000, &session_present);
 
     if (status != MQTTSuccess)
     {
-        LogPrint("FATAL", __FILE__, "...MQTT broker connection failed\n");
+        LogPrintFatal("...MQTT broker connection failed with: %s\n", MQTT_Status_strerror(status));
         Fault();
     }
 
-    LogPrint("INFO", __FILE__, "...MQTT broker connection success\n");
+    LogPrintInfo("...MQTT broker connection success\n");
     connection_state = CONNECTED;
 }
 
@@ -638,12 +584,12 @@ static void MqttContextInit()
     // Setup the main mqtt buffer
     network_buffer.pBuffer = packet_buffer;
     network_buffer.size = MQTT_PACKET_BUFFER_SIZE;
-    LogPrint("INFO", __FILE__, "Attempting to initialise MQTT context...\n");
+    LogPrintDebug("Attempting to initialise MQTT context...\n");
     MQTTStatus_t status = MQTT_Init(&mqtt_context, &transport_interface, GetTimeMs, MqttEventCallback, &network_buffer);
 
     if (status != MQTTSuccess)
     {
-        LogPrint("FATAL", __FILE__, "...MQTT_Init initialise failed\n");
+        LogPrintFatal("...MQTT_Init initialise failed\n");
         Fault();
     }
 
@@ -655,11 +601,11 @@ static void MqttContextInit()
 
     if (status != MQTTSuccess)
     {
-        LogPrint("FATAL", __FILE__, "...MQTT_InitStatefulQoS initialise failed\n");
+        LogPrintFatal("...MQTT_InitStatefulQoS initialise failed with: %s\n", MQTT_Status_strerror(status));
         Fault();
     }
 
-    LogPrint("INFO", __FILE__, "...MQTT context initialise success\n");
+    LogPrintDebug("...MQTT context initialise success\n");
 }
 
 /*-----------------------------------------------------------*/
@@ -668,19 +614,21 @@ void MqttEventCallback(MQTTContext_t *mqtt_context, MQTTPacketInfo_t *packet_inf
 {
     if (deserialized_info->pPublishInfo != NULL)
     {
-        LogPrint("DEBUG", __FILE__, "Received message on topic %.*s: %.*s\n",
-                 deserialized_info->pPublishInfo->topicNameLength, deserialized_info->pPublishInfo->pTopicName,
-                 deserialized_info->pPublishInfo->payloadLength, (const char *)deserialized_info->pPublishInfo->pPayload);
+        LogPrintDebug("Received subscribed message, t:'%s', tl:%u, p:'%s', pl:%u\n",
+                      deserialized_info->pPublishInfo->pTopicName,
+                      deserialized_info->pPublishInfo->topicNameLength,
+                      (const char *)deserialized_info->pPublishInfo->pPayload,
+                      deserialized_info->pPublishInfo->payloadLength);
 
         if (deserialized_info->pPublishInfo->topicNameLength > MQTT_TOPIC_BUFFER_SIZE)
         {
-            LogPrint("FATAL", __FILE__, "deserialized_info->pPublishInfo->topicNameLength > MQTT_TOPIC_BUFFER_SIZE\n");
+            LogPrintFatal("deserialized_info->pPublishInfo->topicNameLength > MQTT_TOPIC_BUFFER_SIZE\n");
             Fault();
         }
 
         if (deserialized_info->pPublishInfo->payloadLength > MQTT_PAYLOAD_BUFFER_SIZE)
         {
-            LogPrint("FATAL", __FILE__, "deserialized_info->pPublishInfo->payloadLength > MQTT_PAYLOAD_BUFFER_SIZE\n");
+            LogPrintFatal("deserialized_info->pPublishInfo->payloadLength > MQTT_PAYLOAD_BUFFER_SIZE\n");
             Fault();
         }
 
@@ -692,7 +640,7 @@ void MqttEventCallback(MQTTContext_t *mqtt_context, MQTTPacketInfo_t *packet_inf
 
         if (xQueueSend(subscription_queue, &message, portMAX_DELAY) != pdTRUE)
         {
-            LogPrint("FATAL", __FILE__, "Failed to send message to subscription_queue\n");
+            LogPrintFatal("Failed to send message to subscription_queue\n");
             Fault();
         }
     }
@@ -704,12 +652,12 @@ static void MqttTransportConnect()
 {
     struct sockaddr_in server_address;
     int socket;
-    LogPrint("DEBUG", __FILE__, "Creating lwip socket...\n");
+    LogPrintDebug("Creating lwip socket...\n");
     socket = lwip_socket(AF_INET, SOCK_STREAM, 0);
 
     if (socket < 0)
     {
-        LogPrint("FATAL", __FILE__, "lwip_socket() failed\n");
+        LogPrintFatal("lwip_socket() failed\n");
         Fault();
     }
 
@@ -717,12 +665,12 @@ static void MqttTransportConnect()
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(MQTT_BROKER_PORT);
     server_address.sin_addr.s_addr = inet_addr(MQTT_BROKER_ADDRESS);
-    LogPrint("DEBUG", __FILE__, "Connecting via lwip...\n");
+    LogPrintInfo("Connecting to MQTT broker socket at '%s:%u' ...\n", MQTT_BROKER_ADDRESS, MQTT_BROKER_PORT);
     int lwip_connect_ret = lwip_connect(socket, (struct sockaddr *)&server_address, sizeof(server_address));
 
     if (lwip_connect_ret < 0)
     {
-        LogPrint("FATAL", __FILE__, "lwip_connect failed with %i - is MQTT broker online?\n", lwip_connect_ret);
+        LogPrintFatal("lwip_connect() failed with %i - is MQTT broker online?\n", lwip_connect_ret);
         lwip_close(socket);
         Fault();
     }
@@ -742,7 +690,6 @@ static void MqttTransportConnect()
 
 static void MqttTransportDisconnect(NetworkContext_t *network_context)
 {
-    LogPrint("DEBUG", __FILE__, "MqttTransportDisconnect\n");
     lwip_close(network_context->socket);
 }
 
@@ -761,7 +708,7 @@ static int32_t MqttTransportSend(NetworkContext_t *network_context, const void *
     // Send error
     else if (result < 0)
     {
-        LogPrint("DEBUG", __FILE__, "Send failed: %s\n", result);
+        LogPrintDebug("Send failed: %s\n", result);
         return SEND_RECV_FAILED;
     }
     // Sent some some data
@@ -769,7 +716,7 @@ static int32_t MqttTransportSend(NetworkContext_t *network_context, const void *
     {
         char output_hex[(bytes_sent * 3) + 1];
         BytesToHex(output_hex, sizeof(output_hex), buffer, bytes_sent);
-        LogPrint("DEBUG", __FILE__, "Sent bytes on socket: %s\n", &output_hex);
+        LogPrintDebug("Sent bytes on socket: %s\n", &output_hex);
         bytes_sent = result;
     }
 
@@ -791,16 +738,21 @@ static int32_t MqttTransportRecv(NetworkContext_t *network_context, void *buffer
     // Recv error
     else if (result < 0)
     {
-        LogPrint("DEBUG", __FILE__, "Recv failed: %s\n", result);
+        LogPrintDebug("Recv failed: %s\n", result);
         return SEND_RECV_FAILED;
     }
     // Got some data
     else
     {
+#ifdef DEBUG
+        size_t used_buffer = buffer - ((void *)packet_buffer);
+        size_t remaining_buffer = MQTT_PACKET_BUFFER_SIZE - used_buffer;
+        LogPrintInfo("Recv buffer used: %u, remaining: %u\n", used_buffer, remaining_buffer);
+#endif
         bytes_received = result;
         char output_hex[(bytes_received * 3) + 1];
         BytesToHex(output_hex, sizeof(output_hex), buffer, bytes_received);
-        //LogPrint("DEBUG", __FILE__, "Recvd %i bytes on socket: %s\n", bytes_received, &output_hex);
+        LogPrintDebug("Recvd %i bytes on socket: %s\n", bytes_received, &output_hex);
     }
 
     return bytes_received;
@@ -819,21 +771,19 @@ static void MqttSubscribe(const char *topic,
         .topicFilterLength = (uint16_t) topic_length,
         .qos = qos
     };
-    LogPrint("DEBUG",
-             __FILE__,
-             "Attempting to subscribe: t:'%s', tl:%u\n",
-             subscribe_info.pTopicFilter,
-             subscribe_info.topicFilterLength);
+    LogPrintDebug("Attempting to subscribe: t:'%s', tl:%u\n",
+                  subscribe_info.pTopicFilter,
+                  subscribe_info.topicFilterLength);
     uint16_t packet_id = MQTT_GetPacketId(&mqtt_context);
     MQTTStatus_t status = MQTT_Subscribe(&mqtt_context, &subscribe_info, 1, packet_id);
 
     if (status != MQTTSuccess)
     {
-        LogPrint("FATAL", __FILE__, "...subscription failed with: %u\n", status);
+        LogPrintFatal("...subscription failed with: %s\n", MQTT_Status_strerror(status));
         Fault();
     }
 
-    LogPrint("INFO", __FILE__, "...subscription success\n");
+    LogPrintDebug("...subscription success\n");
 }
 
 /*-----------------------------------------------------------*/
@@ -855,21 +805,31 @@ static void MqttPublish(const char *topic,
         .pPayload = payload,
         .payloadLength = (uint16_t) payload_length
     };
-    LogPrint("DEBUG",
-             __FILE__,
-             "Attempting to publish: t:'%s', tl:%u, p:'%s', pl:%u\n",
-             publish_info.pTopicName,
-             publish_info.topicNameLength,
-             publish_info.pPayload,
-             publish_info.payloadLength);
+    LogPrintDebug("Attempting to publish, t:'%s', tl:%u, p:'%s', pl:%u\n",
+                  topic,
+                  topic_length,
+                  payload,
+                  payload_length);
     uint16_t packet_id = MQTT_GetPacketId(&mqtt_context);
     MQTTStatus_t status = MQTT_Publish(&mqtt_context, &publish_info, packet_id);
 
+    // If we've failed check to see if this was due to QoS 1/2 buffers being full
+    // If so just try to send with QoS 0 instead, we still might be able to get
+    // the message to the broker
+    if (status == MQTTNoMemory &&
+            (qos == MQTTQoS1 || qos == MQTTQoS2))
+    {
+        LogPrintWarn("...publish failed due to full state buffers, retrying at QoS 0\n");
+        publish_info.qos = MQTTQoS0;
+        packet_id = MQTT_GetPacketId(&mqtt_context);
+        status = MQTT_Publish(&mqtt_context, &publish_info, packet_id);
+    }
+
     if (status != MQTTSuccess)
     {
-        LogPrint("FATAL", __FILE__, "...publish failed with: %u\n", status);
+        LogPrintFatal("...publish failed with: %s\n", MQTT_Status_strerror(status));
         Fault();
     }
 
-    LogPrint("INFO", __FILE__, "...publish success\n");
+    LogPrintDebug("...publish success\n");
 }

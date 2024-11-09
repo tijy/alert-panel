@@ -28,18 +28,19 @@
 #ifndef _LOG_H
 #define _LOG_H
 
+#ifdef DEBUG
+#define LogPrintDebug(message, ...) LogPrint("DEBUG", __FILE__, message, ##__VA_ARGS__)
+#else
+#define LogPrintDebug(message, ...)
+#endif
+#define LogPrintInfo(message, ...) LogPrint("INFO", __FILE__, message, ##__VA_ARGS__)
+#define LogPrintWarn(message, ...) LogPrint("WARN", __FILE__, message, ##__VA_ARGS__)
+#define LogPrintError(message, ...) LogPrint("ERROR", __FILE__, message, ##__VA_ARGS__)
+#define LogPrintFatal(message, ...) LogPrint("FATAL", __FILE__, message, ##__VA_ARGS__)
+
+
 // FreeRTOS-Kernel includes
 #include "FreeRTOS.h"
-
-typedef enum
-{
-    DEBUG = 1,
-    INFO = 2,
-    WARN = 3,
-    ERROR = 4,
-    FATAL = 5
-}
-LogLevel_t;
 
 /**
  * @brief

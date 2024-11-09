@@ -81,6 +81,10 @@ void KeypadDriverInit(void)
     memset(led_buffer, 0, sizeof(led_buffer));
     led_data = led_buffer + 4;
 
+    // Strange behavior here. If we don't initialise the brightness/color(?)
+    // data before initialising the keypad, it doesn't work properly.
+    // So initialise with some non-zero values, and then set back to zeros
+    // after the keypad has been initialised
     for (uint16_t i = 0; i < NUM_PADS; i++)
     {
         led_restore_brightness[i] = 0.5f;
@@ -89,6 +93,7 @@ void KeypadDriverInit(void)
         KeypadDriverSetLedColour(i, 255, 255, 255);
     }
 
+    // Init keypad
     i2c_init(i2c0, 400000);
     gpio_set_function(SDA, GPIO_FUNC_I2C);
     gpio_pull_up(SDA);
@@ -102,6 +107,7 @@ void KeypadDriverInit(void)
     gpio_set_function(MOSI, GPIO_FUNC_SPI);
     KeypadDriverFlush();
 
+    // Set back to zeros
     for (uint16_t i = 0; i < NUM_PADS; i++)
     {
         KeypadDriverSetLedOff(i);

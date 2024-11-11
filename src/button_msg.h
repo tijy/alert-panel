@@ -22,11 +22,11 @@
  */
 
 /**
-* @file led_msg.h
+* @file button_msg.h
 * @brief Public functions in this module file are NOT thread-safe
 */
-#ifndef _LED_MSG_H
-#define _LED_MSG_H
+#ifndef _BUTTON_MSG_H
+#define _BUTTON_MSG_H
 
 // standard includes
 #include <stdint.h>
@@ -37,56 +37,11 @@
 /**
  * @brief
  *
- * @param topic_buffer
- * @param buffer_size
- */
-void LedMsgBuildAvailableTopic(char *topic_buffer, size_t buffer_size);
-
-/**
- * @brief
- *
- * @param online
- * @param payload_buffer
- * @param buffer_size
- */
-void LedMsgBuildAvailablePayload(bool online, char *payload_buffer, size_t buffer_size);
-
-/**
- * @brief
- *
- */
-void LedMsgBuildCmdTopic(char *topic_buffer, size_t buffer_size);
-
-/**
- * @brief
- *
- * @param params
- * @param topic
- * @param topic_length
- * @return true
- * @return false
- */
-bool LedMsgParseCmdTopic(KeypadLedParams_t *params, char *topic, size_t topic_length);
-
-/**
- * @brief
- *
- * @param params
- * @param payload
- * @param payload_length
- * @return true
- * @return false
- */
-bool LedMsgParseCmdPayload(KeypadLedParams_t *params, const char *payload, size_t payload_length);
-
-/**
- * @brief
- *
  * @param params
  * @param topic_buffer
  * @param buffer_size
  */
-void LedMsgBuildStateTopic(KeypadLedParams_t *params, char *topic_buffer, size_t buffer_size);
+void ButtonMsgBuildStateTopic(KeypadButtonParams_t *params, char *topic_buffer, size_t buffer_size);
 
 /**
  * @brief
@@ -95,6 +50,6 @@ void LedMsgBuildStateTopic(KeypadLedParams_t *params, char *topic_buffer, size_t
  * @param payload_buffer
  * @param buffer_size
  */
-void LedMsgBuildStatePayload(KeypadLedParams_t *params, char *payload_buffer, size_t buffer_size);
+void ButtonMsgBuildStatePayload(KeypadButtonParams_t *params, char *payload_buffer, size_t buffer_size);
 
-#endif //_LED_MSG_H
+#endif //_BUTTON_MSG_H

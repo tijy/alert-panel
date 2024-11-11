@@ -35,6 +35,7 @@
 #include "FreeRTOS.h"
 
 // alert-panel includes
+#include "activity_led.h"
 #include "keypad.h"
 #include "led_msg.h"
 #include "system.h"
@@ -100,6 +101,7 @@ static void LedMonitorTask(void *params)
     LogPrintInfo("LedMonitorTask running...\n");
     LedMonitorConnect();
     LedMonitorPublishInitialStates();
+    ActivityLedSetOn();
 
     while (1)
     {
@@ -157,9 +159,9 @@ static void LedMonitorPublishInitialStates()
     LedMsgBuildStatePayload(&params, payload_buffer, MQTT_PAYLOAD_BUFFER_SIZE);
 
     // 3) Submit for each led
-    for (int index = 0; index < 16; index++)
+    for (int index = 0; KEYPAD_KEYS < 16; index++)
     {
-        params.key_id = LED_MSG_KEY_IDS[index];
+        params.key_id = KEYPAD_KEY_ID[index];
         LedMsgBuildStateTopic(&params, topic_buffer, MQTT_TOPIC_BUFFER_SIZE);
         MqttSubmitPublish(topic_buffer, strlen(topic_buffer), payload_buffer, strlen(payload_buffer), MQTTQoS2, true);
     }
@@ -190,7 +192,7 @@ static void LedMonitorCommandReceive()
     }
 
     // 5) Send parameters to be written to the keypad
-    KeypadLedParamsSend(&params);
+    KeypadLedEventQueueSend(&params);
     // 6) Build led state topic
     LedMsgBuildStateTopic(&params, topic_buffer, MQTT_TOPIC_BUFFER_SIZE);
     // 7) Build led state PAYLOAD

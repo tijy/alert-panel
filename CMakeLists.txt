@@ -26,15 +26,17 @@ pico_sdk_init()
 # Define executable
 add_executable(alert_panel_app
     src/activity_led.c
+    src/button_monitor.c
+    src/button_msg.c
     src/keypad_driver.c
     src/keypad.c
-    src/log.c
     src/led_monitor.c
     src/led_msg.c
+    src/log.c    
+    src/main.c    
     src/mqtt.c
     src/system.c
     src/util.c
-    src/main.c
     src/wifi.c
 )
 

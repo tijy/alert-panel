@@ -22,39 +22,48 @@
  */
 
 /**
-* @file util.c
+* @file button_msg.c
 * @brief
 */
-#include "util.h"
+#include "button_msg.h"
 
 // standard includes
+#include <string.h>
 #include <stdio.h>
 
-// FreeRTOS-Kernel includes
-#include "FreeRTOS.h"
-#include "task.h"
+// tiny-json includes
+#include "tiny-json.h"
+
+// alert-panel includes
+#include "log.h"
+#include "alert_panel_config.h"
+
+// button states: from alert-panel to broker (publish)
+#define BUTTON_STATE_TOPIC_FMT         MQTT_CLIENT_ID "/button/state/%c"
+#define BUTTON_STATE_PAYLOAD_PRESS    "press"
+#define BUTTON_STATE_PAYLOAD_HOLD     "hold"
 
 /*-----------------------------------------------------------*/
 
-void BytesToHex(char *output_hex, size_t output_hex_length, const char *buffer, const size_t buffer_length)
+void ButtonMsgBuildStateTopic(KeypadButtonParams_t *params, char *topic_buffer, size_t buffer_size)
 {
-    for (size_t i = 0; i < buffer_length; i++)
-    {
-        output_hex += sprintf(output_hex, "%02X ", buffer[i]);
-    }
+    snprintf(topic_buffer,
+             buffer_size,
+             BUTTON_STATE_TOPIC_FMT,
+             params->key_id);
 }
 
 /*-----------------------------------------------------------*/
 
-uint32_t GetTimeMs(void)
+void ButtonMsgBuildStatePayload(KeypadButtonParams_t *params, char *payload_buffer, size_t buffer_size)
 {
-    // Implement a platform-specific way to return current time in milliseconds.
-    return (uint32_t)(xTaskGetTickCount() * portTICK_PERIOD_MS);
-}
-
-/*-----------------------------------------------------------*/
-
-uint32_t GetElapsedMs(uint32_t earlier, uint32_t later)
-{
-    return later - earlier;
+    // 1) Start json
+    snprintf(payload_buffer, buffer_size, "{");
+    bool comma_needed = false;
+    // 2) Add event
+    snprintf(payload_buffer + strlen(payload_buffer), buffer_size - strlen(payload_buffer),
+             "\"event_type\":\"%s\"", params->event == PRESS ? BUTTON_STATE_PAYLOAD_PRESS : BUTTON_STATE_PAYLOAD_HOLD);
+    comma_needed = true;
+    // 3) End json
+    strncat(payload_buffer, "}", buffer_size - strlen(payload_buffer) - 1);
 }

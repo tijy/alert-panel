@@ -53,12 +53,6 @@
  * @brief
  *
  */
-const char LED_MSG_KEY_IDS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
-/**
- * @brief
- *
- */
 static char json_str[MQTT_PAYLOAD_BUFFER_SIZE];
 
 /**
@@ -247,7 +241,7 @@ void LedMsgBuildStatePayload(KeypadLedParams_t *params, char *payload_buffer, si
     if (params->state_set)
     {
         snprintf(payload_buffer + strlen(payload_buffer), buffer_size - strlen(payload_buffer),
-                 "\"state\": \"%s\"", params->state ? "ON" : "OFF");
+                 "\"state\":\"%s\"", params->state ? "ON" : "OFF");
         comma_needed = true;
     }
 
@@ -256,11 +250,11 @@ void LedMsgBuildStatePayload(KeypadLedParams_t *params, char *payload_buffer, si
     {
         if (comma_needed)
         {
-            strncat(payload_buffer, ", ", buffer_size - strlen(payload_buffer) - 1);
+            strncat(payload_buffer, ",", buffer_size - strlen(payload_buffer) - 1);
         }
 
         snprintf(payload_buffer + strlen(payload_buffer), buffer_size - strlen(payload_buffer),
-                 "\"brightness\": %d", params->brightness);
+                 "\"brightness\":%d", params->brightness);
         comma_needed = true;
     }
 
@@ -269,11 +263,11 @@ void LedMsgBuildStatePayload(KeypadLedParams_t *params, char *payload_buffer, si
     {
         if (comma_needed)
         {
-            strncat(payload_buffer, ", ", buffer_size - strlen(payload_buffer) - 1);
+            strncat(payload_buffer, ",", buffer_size - strlen(payload_buffer) - 1);
         }
 
         snprintf(payload_buffer + strlen(payload_buffer), buffer_size - strlen(payload_buffer),
-                 "\"color\": {\"r\": %d, \"g\": %d, \"b\": %d}",
+                 "\"color\":{\"r\":%d,\"g\":%d,\"b\":%d}",
                  params->red, params->green, params->blue);
         comma_needed = true;
     }
@@ -283,10 +277,10 @@ void LedMsgBuildStatePayload(KeypadLedParams_t *params, char *payload_buffer, si
     {
         if (comma_needed)
         {
-            strncat(payload_buffer, ", ", buffer_size - strlen(payload_buffer) - 1);
+            strncat(payload_buffer, ",", buffer_size - strlen(payload_buffer) - 1);
         }
 
-        strncat(payload_buffer, "\"color_mode\": \"rgb\"", buffer_size - strlen(payload_buffer) - 1);
+        strncat(payload_buffer, "\"color_mode\":\"rgb\"", buffer_size - strlen(payload_buffer) - 1);
     }
 
     // 6) End json

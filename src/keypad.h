@@ -35,6 +35,20 @@
 // FreeRTOS-Kernel includes
 #include "FreeRTOS.h"
 
+#define KEYPAD_KEYS 16
+
+/**
+ * @brief
+ *
+ */
+extern const char KEYPAD_KEY_ID[];
+
+/**
+ * @brief
+ *
+ */
+extern const uint8_t KEYPAD_KEY_INDEX[];
+
 typedef enum
 {
     NONE = 1,
@@ -43,6 +57,10 @@ typedef enum
 }
 KeypadLedEffect_t;
 
+/**
+ * @brief Parameters used for writing LED state to a key
+ *
+ */
 typedef struct
 {
     char key_id;
@@ -58,6 +76,28 @@ typedef struct
     bool state;
 }
 KeypadLedParams_t;
+
+/**
+ * @brief
+ *
+ */
+typedef enum
+{
+    PRESS = 1,
+    HOLD = 2,
+}
+KeypadButtonEvent_t;
+
+/**
+ * @brief Parameters used for reading button state from a key
+ *
+ */
+typedef struct
+{
+    char key_id;
+    KeypadButtonEvent_t event;
+}
+KeypadButtonParams_t;
 
 /**
  * @brief
@@ -79,6 +119,13 @@ void KeypadTaskCreate(UBaseType_t priority, UBaseType_t core_affinity_mask);
  *
  * @param params
  */
-void KeypadLedParamsSend(KeypadLedParams_t *params);
+void KeypadLedEventQueueSend(KeypadLedParams_t *params);
+
+/**
+ * @brief
+ *
+ * @return KeypadButtonParams_t
+ */
+KeypadButtonParams_t KeypadButtonEventQueueReceive();
 
 #endif //_KEYPAD_H

@@ -22,11 +22,11 @@
  */
 
 /**
-* @file led_monitor.h
+* @file button_monitor.h
 * @brief Public functions in this module file are thread-safe
 */
-#ifndef _LED_MONITOR_H
-#define _LED_MONITOR_H
+#ifndef _BUTTON_MONITOR_H
+#define _BUTTON_MONITOR_H
 
 // FreeRTOS-Kernel includes
 #include "FreeRTOS.h"
@@ -37,6 +37,6 @@
  * @param priority
  * @param core_affinity_mask
  */
-void LedMonitorTaskCreate(UBaseType_t priority, UBaseType_t core_affinity_mask);
+void ButtonMonitorTaskCreate(UBaseType_t priority, UBaseType_t core_affinity_mask);
 
-#endif //_LED_MONITOR_H
+#endif //_BUTTON_MONITOR_H

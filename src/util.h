@@ -33,7 +33,8 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief Converts a byte array to hex string (for log purposes)
+ * hex_length must == (buffer_length * 3) + 1
  *
  * @param output_hex
  * @param output_hex_length
@@ -43,10 +44,16 @@
 void BytesToHex(char *output_hex, size_t output_hex_length, const char *buffer, const size_t buffer_length);
 
 /**
- * @brief Get the Time Ms object
+ * @brief Get the current time since start in ms
  *
  * @return uint32_t
  */
 uint32_t GetTimeMs(void);
+
+/**
+ * @brief
+ *
+ */
+uint32_t GetElapsedMs(uint32_t earlier, uint32_t later);
 
 #endif //_UTIL_H

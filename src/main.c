@@ -37,11 +37,12 @@
 
 // alert-panel includes
 #include "activity_led.h"
-#include "system.h"
-#include "mqtt.h"
-#include "log.h"
-#include "led_monitor.h"
+#include "button_monitor.h"
 #include "keypad.h"
+#include "led_monitor.h"
+#include "log.h"
+#include "mqtt.h"
+#include "system.h"
 #include "wifi.h"
 #include "alert_panel_config.h"
 
@@ -80,7 +81,7 @@ static void launch_task(void *params)
     KeypadInit();
     KeypadTaskCreate(PRIORITY_KEYPAD, AFFINITY_CORE_0);
     // 5) Start led & button monitoring
-    //ButtonMonitorTaskCreate(PRIORITY_BUTTON_MONITOR, AFFINITY_CORE_0);
+    ButtonMonitorTaskCreate(PRIORITY_BUTTON_MONITOR, AFFINITY_CORE_0);
     LedMonitorTaskCreate(PRIORITY_LED_MONITOR, AFFINITY_CORE_0);
 
     // Watchdog for hangs

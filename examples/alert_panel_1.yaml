@@ -1,0 +1,62 @@
+# --------------------------------------------------------------------------------
+# Example MQTT configuration in Home Assistant
+# Add this file using 'mqtt: !include alert_panel_1.yaml' in configuration.yaml
+# --------------------------------------------------------------------------------
+
+# Light configuration to allow each LED on the keypad to appear as a colour light
+light:
+  - schema: json
+    name: "Led 0"
+    unique_id: "alert_panel_1_led_0"
+    availability_topic: "alert_panel_1/available"
+    state_topic: "alert_panel_1/led/state/0"
+    command_topic: "alert_panel_1/led/cmd/0"
+    brightness: true
+    supported_color_modes: ["rgb"]
+    icon: mdi:led-variant-on
+    device:
+      identifiers: "alert_panel_1"
+      name: "Alert Panel 1"
+
+  - schema: json
+    name: "Led 1"
+    unique_id: "alert_panel_1_led_1"
+    availability_topic: "alert_panel_1/available"
+    state_topic: "alert_panel_1/led/state/1"
+    command_topic: "alert_panel_1/led/cmd/1"
+    brightness: true
+    supported_color_modes: ["rgb"]
+    icon: mdi:led-variant-on
+    device:
+      identifiers: "alert_panel_1"
+      name: "Alert Panel 1"
+      
+  # ... duplicate for remaining LEDs 0 -> f
+
+# Button configuration to allow each button on the keypad to raise press and hold events
+event:
+  - name: "Button 0"
+    unique_id: "alert_panel_1_button_0"
+    state_topic: "alert_panel_1/button/state/0"
+    event_types:
+      - "press"
+      - "hold"
+    qos: 2
+    device_class: "button"
+    device:
+      identifiers: "alert_panel_1"
+      name: "Alert Panel 1"
+
+  - name: "Button 1"
+    unique_id: "alert_panel_1_button_1"
+    state_topic: "alert_panel_1/button/state/1"
+    event_types:
+      - "press"
+      - "hold"
+    qos: 2
+    device_class: "button"
+    device:
+      identifiers: "alert_panel_1"
+      name: "Alert Panel 1"
+      
+  # ... duplicate for remaining Buttons 0 -> f

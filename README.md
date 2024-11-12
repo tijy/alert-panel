@@ -17,6 +17,12 @@ A FreeRTOS-Based App for the Raspberry Pi Pico W exposing the Pimoroni Pico RGB 
 7. Make: `make alert-panel-app`
 8. Upload to pico using BOOTSEL: `build/alert_panel_app.uf2`
 
-## Style
+## Styling
 
 1. Use astyle: `astyle --options=./.astylerc ./src/*.c ./src/*.h ./include/*.h`
+
+## Home Assistant
+
+The MQTT messaging (payloads and topics) has been build to support easy integration into Home Assistant.
+Each LED can be set up as a light entity and each Button can be configured to raise events.
+See `example/alert_panel_1.yaml` for an example configuration of how to integrate into Home Assistant.
